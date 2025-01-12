@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base target="_blank" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none';
+        img-src 'self';
+        script-src 'sha256-hDEYZnO9EiM174lkvyQc7WCaZ8ywsoxw7oNqZHS4s0s=';
+        style-src https://fonts.googleapis.com/ 'sha256-YnvbllBDk8Y8JFKha3cnok8zAqjaae9iVGee7F6Yze4=';
+        font-src https://fonts.gstatic.com/;
+        form-action 'none'
+        " />
+    <title>What FourCC?</title>
+    <script>
+        function fourCCToString(fourCC) {
+            let fourCCAsNumber = Number(fourCC);
+            let char1 = (fourCCAsNumber >> 24) & 0xff;
+            let char2 = (fourCCAsNumber >> 16) & 0xff;
+            let char3 = (fourCCAsNumber >> 8) & 0xff;
+            let char4 = fourCCAsNumber & 0xff;
+            function isPrintableASCII(char) {
+                return char >= 0x20 && char <= 0x7e;
+            }
+            if (
+                !isPrintableASCII(char1) ||
+                !isPrintableASCII(char2) ||
+                !isPrintableASCII(char3) ||
+                !isPrintableASCII(char4)
+            ) {
+                return "";
+            }
+            return String.fromCharCode(char1, char2, char3, char4);
+        }
+        function stringToFourCC(string) {
+            if (string.length !== 4) {
+                return "";
+            }
+            return (
+                "0x" +
+                (
+                    (string.charCodeAt(0) << 24) |
+                    (string.charCodeAt(1) << 16) |
+                    (string.charCodeAt(2) << 8) |
+                    string.charCodeAt(3)
+                )
+                    .toString(16)
+                    .padStart(8, "0")
+            );
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            let fourCCInput = document.getElementById("fourCC");
+            let stringInput = document.getElementById("string");
+            fourCCInput.addEventListener("input", function () {
+                stringInput.value = fourCCToString(fourCCInput.value);
+            });
+            stringInput.addEventListener("input", function () {
+                fourCCInput.value = stringToFourCC(stringInput.value).toString(16);
+            });
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap');
+
+        html {
+            height: 100%;
+
+            body {
+                background-color: oklch(19% 0.025 265);
+                color: oklch(80% 0.025 265);
+                font-family: 'Geist', sans-serif;
+                font-size: 1rem;
+                padding: 0 1.25rem;
+                margin: 0;
+
+                a {
+                    &:link {
+                        color: oklch(65% 0.1 265);
+                    }
+
+                    &:visited {
+                        color: oklch(65% 0.1 305);
+                    }
+
+                    &:hover,
+                    &:focus {
+                        text-decoration-thickness: 0.15lh;
+
+                        &:active {
+                            text-decoration-thickness: 0.2lh;
+                        }
+                    }
+                }
+            }
+
+            h1,
+            h2 {
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                margin: 0;
+                margin-bottom: 1.5rem;
+            }
+
+            hr {
+                margin: 1.5rem 0;
+                border-color: currentColor;
+            }
+
+            p.description {
+                text-align: justify;
+            }
+
+            table#convert {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 20rem;
+                table-layout: fixed;
+
+                th::after {
+                    content: ':';
+                }
+
+                td {
+                    width: 50%;
+                }
+
+                th,
+                td {
+                    text-align: center;
+                }
+
+                input {
+                    font-family: 'Geist Mono', monospace;
+                    background: transparent;
+                    border: none;
+                    color: oklch(80% 0.025 265);
+                    font-size: 1.25rem;
+                    border-bottom: 1px solid currentColor;
+
+                    &::placeholder {
+                        color: oklch(75% 0 265);
+                        opacity: 0.5;
+                    }
+
+                    &#fourCC {
+                        width: calc(10ch);
+                    }
+
+                    &#string {
+                        width: 4ch;
+                    }
+                }
+            }
+
+            p#comingsoon {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>What <a href="https://en.wikipedia.org/wiki/FourCC">FourCC</a>?</h1>
+    <hr>
+    <h2>What is This Page?</h2>
+    <p class="description">
+        This page is meant for working with (specifically <em>Apple</em>-related) FourCC's. A FourCC (four-character code) is a sequence of four ASCII bytes. It is often used to identify data formats, but is used in many other contexts as well (especially by Apple). While Microsoft also uses the FOURCC concept, this page is not intended for working with Microsoft's FOURCC's (although the concept is basically the same, so at least the converter will likely work).
+    </p>
+    <p class="description">
+        When implemented, the search functionality of this page will allow searching of <em>Apple</em>-related FourCC's. There will be no consideration for Microsoft's FOURCC's, although there may be some overlap by coincidence.
+    </p>
+    <hr>
+    <h2>Convert</h2>
+    <table id="convert">
+        <tr>
+            <th>FourCC</th>
+            <th>String</th>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" id="fourCC" maxlength="10" placeholder="0x00000000" />
+            </td>
+            <td>
+                <input type="text" id="string" maxlength="4" placeholder="____" />
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <h2>Search</h2>
+    <p id="comingsoon">Coming soon (hopefully)...</p>
+</body>
+
+</html>
